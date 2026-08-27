@@ -1,6 +1,9 @@
 export function getApiUrl(): string {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.')) {
+      return `http://${hostname}:3001/api`;
+    }
     if (hostname.includes('stududu.site') || hostname.includes('vercel.app') || hostname.includes('stududu.com.vn')) {
       return 'https://stududu-api.onrender.com/api';
     }
@@ -14,6 +17,7 @@ export function getApiUrl(): string {
   }
   return 'https://stududu-api.onrender.com/api';
 }
+
 
 
 export class ApiError extends Error {

@@ -12,9 +12,14 @@ export function GoogleSignInButton({ t, label }: GoogleSignInButtonProps) {
   const handleGoogleRedirect = () => {
     import("@/lib/google-auth").then(({ promptGoogleAuth }) => {
       promptGoogleAuth({
-        onSuccess: () => {
-          window.location.href = "/discover";
+        onSuccess: (data) => {
+          if (data.needsOnboarding) {
+            window.location.href = "/onboarding";
+          } else {
+            window.location.href = "/discover";
+          }
         },
+
         onError: (err) => {
           alert(err);
         },

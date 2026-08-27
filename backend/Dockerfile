@@ -11,16 +11,16 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy Prisma schema and generate client
-COPY prisma ./prisma/
-RUN npx prisma generate
-
 # Copy source code
 COPY . .
+
+# Generate Prisma client for Alpine Linux
+RUN npx prisma generate
 
 # Build application
 RUN npm run build
 
 EXPOSE 3001
 
-CMD ["node", "dist/main.js"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/main.js"]
+

@@ -42,12 +42,13 @@ export async function promptGoogleAuth(options: {
   if (isPrompting) return;
   isPrompting = true;
 
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "405818291263-28cbqt6k8v4mr6mli5t4sb90sc3pnt1m.apps.googleusercontent.com";
   if (!clientId) {
     isPrompting = false;
     options.onError("Google Client ID chưa được cấu hình ở frontend.");
     return;
   }
+
 
   try {
     await loadGoogleScript();

@@ -1,0 +1,57 @@
+services:
+  # 1. Nginx Reverse Proxy (Cổng vào chính cho cả Frontend & Backend API/Socket)
+  nginx:
+    image: nginx:alpine
+    container_name: stududu-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: always
+
+  # 2. Frontend Next.js Standalone
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-/}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+    container_name: stududu-frontend
+    env_file:
+      - ./frontend/.env.local
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: always
+
+  # 3. Backend NestJS API & Socket.IO
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stududu-backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - ./backend/.env
+    expose:
+      - "3001"
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL:-postgresql://stududu:stududu_cloud_2026@169.58.135.50:5432/stududu?schema=stududu}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET:-change-me-access-secret-stududu-2026}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-change-me-refresh-secret-stududu-2026}
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://stududu.com.vn,https://api.stududu.com.vn,https://stududu.io.vn,https://api.stududu.io.vn,http://localhost:3000}
+    restart: always

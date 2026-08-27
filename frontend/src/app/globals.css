@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* stududu redesign — vibrant sunset: nền trắng, primary tím, secondary hồng,
+   warm end cam. Chữ ký thương hiệu = banner gradient tím→hồng→cam
+   (theo Stududu Mockups). */
+:root {
+  /* Canvas Background: clean, soft, natural off-white */
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F9;        /* Bề mặt lõm / input / hover */
+  --foreground: #0F172A;       /* Deep Obsidian Slate dễ đọc, tự nhiên */
+  --muted: #475569;            /* Slate-600 đạt chuẩn AAA */
+  --border: #E2E8F0;           /* Viền Slate-200 sắc nét */
+  --border-strong: #CBD5E1;
+
+  /* Human Brand Colors: Deep Nordic Ocean Teal (WCAG AAA) */
+  --primary: #0D766E;          /* Deep Teal cao cấp */
+  --primary-hover: #044E46;
+  --secondary: #E11D48;        /* Terracotta Rose */
+  --secondary-hover: #BE123C;
+  --accent: #D97706;           /* Honey Amber */
+  --accent-blue: #0369A1;      /* Marine Blue */
+  
+  --success: #059669;
+  --warning: #D97706;
+  --error: #E11D48;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Natural lighting shadows */
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --shadow-card-hover: 0 6px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tiêu đề dùng Plus Jakarta Sans (display), hơi âm tracking cho cảm giác premium */
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Nhãn eyebrow nhỏ trên tiêu đề trang */
+.sd-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Cover banner thương hiệu cho trang Login / Register */
+.sd-cover {
+  background: #0D766E;
+  color: #ffffff;
+}
+
+/* Nút bấm thương hiệu cao cấp (Solid confident action, không pha trộn gradient AI) */
+.sd-btn-gradient {
+  background-color: #0D766E;
+  color: #ffffff;
+  border: 0;
+  font-weight: 700;
+  transition: all 0.15s ease-out;
+}
+.sd-btn-gradient:hover {
+  background-color: #044E46;
+  box-shadow: 0 4px 12px -2px rgba(13, 118, 110, 0.3);
+}
+
+.sd-btn-coral {
+  background: linear-gradient(135deg, #FE6D73 0%, #FF5A5F 100%);
+  color: #fff;
+  border: 0;
+  transition: all 0.2s ease-out;
+}
+.sd-btn-coral:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 12px -2px rgba(254, 109, 115, 0.35);
+}
+
+/* Multi-layered Natural Shadows (Impeccable style: Natural light from above) */
+.shadow-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 12px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+.shadow-elevated {
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
+
+/* Interactive Card Lift */
+.interactive-card {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease;
+}
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.08);
+  border-color: #CBD5E1;
+}
+
+/* Clean Solid Header */
+.app-header {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+/* Smooth Scroll for page navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Nav Item Blur Motion Pill Hover/Active */
+.sd-nav-blur-item {
+  position: relative;
+  transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sd-nav-blur-item::before {
+  content: '';
+  position: absolute;
+  inset: -6px -12px;
+  border-radius: 9999px;
+  background: rgba(13, 118, 110, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(13, 118, 110, 0.15);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.sd-nav-blur-item:hover::before,
+.sd-nav-blur-item:active::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Section Motion Target Blur Effect */
+@keyframes blurMotionPulse {
+  0% {
+    filter: blur(14px);
+    opacity: 0.4;
+    transform: scale(0.97);
+  }
+  50% {
+    filter: blur(3px);
+    opacity: 0.95;
+    transform: scale(1.008);
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sd-blur-motion-active {
+  animation: blurMotionPulse 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: filter, transform, opacity;
+}
+

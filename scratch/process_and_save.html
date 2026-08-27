@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logo Cropper & Transparent Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #333; color: white; }
+    canvas { border: 2px dashed #666; margin: 10px; background: repeating-conic-gradient(#888 0% 25%, #fff 0% 50%) 50% / 20px 20px; }
+    textarea { width: 100%; height: 100px; }
+  </style>
+</head>
+<body>
+  <h2>Cropped Transparent Assets</h2>
+  <div>
+    <h3>Icon:</h3>
+    <canvas id="canvasIcon"></canvas>
+  </div>
+  <div>
+    <h3>Full Logo:</h3>
+    <canvas id="canvasLogo"></canvas>
+  </div>
+  <textarea id="outputJson"></textarea>
+
+<script>
+function cropAndTransparent(img, cropX, cropY, cropW, cropH) {
+  const canvas = document.createElement('canvas');
+  canvas.width = cropW;
+  canvas.height = cropH;
+  const ctx = canvas.getContext('2d');
+  
+  // Draw cropped region
+  ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+  
+  // Make white background transparent
+  const imgData = ctx.getImageData(0, 0, cropW, cropH);
+  const d = imgData.data;
+  for (let i = 0; i < d.length; i += 4) {
+    // If RGB are near white (>230)
+    if (d[i] > 220 && d[i+1] > 220 && d[i+2] > 220) {
+      d[i+3] = 0; // Alpha 0
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return canvas;
+}
+
+window.onload = function() {
+  const imgIcon = new Image();
+  const imgLogo = new Image();
+  let loaded = 0;
+
+  function checkDone() {
+    loaded++;
+    if (loaded === 2) {
+      // Icon cropping
+      // Let's find bounding box automatically for Icon
+      const cIcon = cropAndTransparent(imgIcon, 0, 0, imgIcon.width, imgIcon.height);
+      document.getElementById('canvasIcon').width = cIcon.width;
+      document.getElementById('canvasIcon').height = cIcon.height;
+      document.getElementById('canvasIcon').getContext('2d').drawImage(cIcon, 0, 0);
+
+      // Logo cropping
+      const cLogo = cropAndTransparent(imgLogo, 0, 0, imgLogo.width, imgLogo.height);
+      document.getElementById('canvasLogo').width = cLogo.width;
+      document.getElementById('canvasLogo').height = cLogo.height;
+      document.getElementById('canvasLogo').getContext('2d').drawImage(cLogo, 0, 0);
+
+      const result = {
+        iconBase64: cIcon.toDataURL('image/png'),
+        logoBase64: cLogo.toDataURL('image/png')
+      };
+      document.getElementById('outputJson').value = JSON.stringify(result);
+    }
+  }
+
+  imgIcon.onload = checkDone;
+  imgLogo.onload = checkDone;
+
+  imgIcon.src = 'stududu-icon-user.png';
+  imgLogo.src = 'stududu-logo-user.png';
+};
+</script>
+</body>
+</html>

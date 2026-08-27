@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Crop Helper</title>
+</head>
+<body>
+  <canvas id="cIcon"></canvas>
+  <canvas id="cText"></canvas>
+  <div id="status">Loading...</div>
+<script>
+window.onload = function() {
+  const img = new Image();
+  img.onload = function() {
+    // 1. Icon Crop (Globe + S)
+    // In original image (width 842, height 255):
+    // Icon is roughly X: 65 to 275, Y: 35 to 225
+    const cIcon = document.getElementById('cIcon');
+    cIcon.width = 210;
+    cIcon.height = 190;
+    const ctxI = cIcon.getContext('2d');
+    ctxI.drawImage(img, 65, 35, 210, 190, 0, 0, 210, 190);
+    
+    // Make white transparent for icon
+    let imgDataI = ctxI.getImageData(0, 0, 210, 190);
+    let dI = imgDataI.data;
+    for (let i = 0; i < dI.length; i += 4) {
+      if (dI[i] > 230 && dI[i+1] > 230 && dI[i+2] > 230) dI[i+3] = 0;
+    }
+    ctxI.putImageData(imgDataI, 0, 0);
+
+    // 2. Text Crop (stududu + tagline)
+    // Text is roughly X: 310 to 715, Y: 45 to 195
+    const cText = document.getElementById('cText');
+    cText.width = 405;
+    cText.height = 150;
+    const ctxT = cText.getContext('2d');
+    ctxT.drawImage(img, 310, 45, 405, 150, 0, 0, 405, 150);
+
+    // Make white transparent for text
+    let imgDataT = ctxT.getImageData(0, 0, 405, 150);
+    let dT = imgDataT.data;
+    for (let i = 0; i < dT.length; i += 4) {
+      if (dT[i] > 230 && dT[i+1] > 230 && dT[i+2] > 230) dT[i+3] = 0;
+    }
+    ctxT.putImageData(imgDataT, 0, 0);
+
+    window.iconBase64 = cIcon.toDataURL('image/png');
+    window.textBase64 = cText.toDataURL('image/png');
+    document.getElementById('status').innerText = 'READY';
+  };
+  img.src = '/stududu-logo-user.png';
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Stududu Official Logo Preview</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      gap: 40px;
+    }
+    .logo-card {
+      background: white;
+      padding: 40px 60px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-text {
+      font-size: 52px;
+      font-weight: 900;
+      color: #1B4232;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .tagline-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .tagline-line {
+      height: 3px;
+      flex: 1;
+      background-color: #1B4232;
+      border-radius: 2px;
+    }
+    .tagline-text {
+      font-size: 18px;
+      color: #1B4232;
+      font-weight: 600;
+      white-space: nowrap;
+      letter-spacing: -0.2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-card">
+    <h3 style="margin:0 0 10px 0; color:#64748b;">Logo Icon Only</h3>
+    <svg viewBox="0 0 200 200" width="120" height="120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Globe Outer Circle -->
+      <circle cx="100" cy="100" r="72" stroke="#0084C7" stroke-width="10" fill="none" />
+      
+      <!-- Globe Equator -->
+      <line x1="28" y1="100" x2="172" y2="100" stroke="#0084C7" stroke-width="8" />
+      
+      <!-- Globe Latitudes -->
+      <path d="M 38 68 Q 100 84 162 68" stroke="#0084C7" stroke-width="8" fill="none" />
+      <path d="M 38 132 Q 100 116 162 132" stroke="#0084C7" stroke-width="8" fill="none" />
+
+      <!-- Globe Longitudes -->
+      <line x1="100" y1="28" x2="100" y2="172" stroke="#0084C7" stroke-width="8" />
+      <path d="M 100 28 C 55 55 55 145 100 172" stroke="#0084C7" stroke-width="8" fill="none" />
+      <path d="M 100 28 C 145 55 145 145 100 172" stroke="#0084C7" stroke-width="8" fill="none" />
+
+      <!-- Green 'S' Symbol -->
+      <path
+        d="M 152 50 C 105 18 52 55 92 98 C 128 138 75 182 38 150"
+        stroke="#1B4232"
+        stroke-width="26"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+      />
+    </svg>
+  </div>
+
+  <div class="logo-card">
+    <h3 style="margin:0 0 10px 0; color:#64748b;">Full Logo with Tagline</h3>
+    <div class="logo-row">
+      <svg viewBox="0 0 200 200" width="80" height="80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="72" stroke="#0084C7" stroke-width="10" fill="none" />
+        <line x1="28" y1="100" x2="172" y2="100" stroke="#0084C7" stroke-width="8" />
+        <path d="M 38 68 Q 100 84 162 68" stroke="#0084C7" stroke-width="8" fill="none" />
+        <path d="M 38 132 Q 100 116 162 132" stroke="#0084C7" stroke-width="8" fill="none" />
+        <line x1="100" y1="28" x2="100" y2="172" stroke="#0084C7" stroke-width="8" />
+        <path d="M 100 28 C 55 55 55 145 100 172" stroke="#0084C7" stroke-width="8" fill="none" />
+        <path d="M 100 28 C 145 55 145 145 100 172" stroke="#0084C7" stroke-width="8" fill="none" />
+        <path
+          d="M 152 50 C 105 18 52 55 92 98 C 128 138 75 182 38 150"
+          stroke="#1B4232"
+          stroke-width="26"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"
+        />
+      </svg>
+      <div style="display: flex; flex-direction: column;">
+        <span class="brand-text">stududu</span>
+        <div class="tagline-container">
+          <span class="tagline-line"></span>
+          <span class="tagline-text">Speak global, connect local.</span>
+          <span class="tagline-line"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

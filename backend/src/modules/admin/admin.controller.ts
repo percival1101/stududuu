@@ -1,0 +1,153 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ReportStatus, UserRole, UserStatus } from '@prisma/client';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import type { JwtPayload } from '../../common/types/jwt-payload';
+import { AdminService } from './admin.service';
+import {
+  CreateLanguageDto,
+  CreateTopicDto,
+  UpdateLanguageDto,
+  UpdateTopicDto,
+} from './dto/catalog.dto';
+import { ModerateDto } from './dto/moderate.dto';
+
+// US-19 AC3 — chỉ role = admin; member thường bị RolesGuard chặn (403)
+@Controller('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.admin)
+export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
+
+  @Get('stats')
+  getDashboardStats() {
+    return this.adminService.getDashboardStats();
+  }
+
+  @Get('users')
+  getUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('status') status?: UserStatus,
+  ) {
+    return this.adminService.getUsers(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
+      search,
+      status,
+    );
+  }
+
+  @Get('reports')
+  getReports(@Query('status') status?: ReportStatus) {
+    return this.adminService.getReports(status);
+  }
+
+  @Patch('reports/:id')
+  updateReport(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status') status: ReportStatus,
+  ) {
+    return this.adminService.updateReportStatus(id, status);
+  }
+
+  @Post('users/:id/moderate')
+  moderate(
+    @CurrentUser() admin: JwtPayload,
+    @Param('id', ParseIntPipe) targetUserId: number,
+    @Body() dto: ModerateDto,
+  ) {
+    return this.adminService.moderate(admin.sub, targetUserId, dto);
+  }
+
+  @Get('users/:id/violations')
+  getViolations(@Param('id', ParseIntPipe) targetUserId: number) {
+    return this.adminService.getViolationHistory(targetUserId);
+  }
+
+  @Get('users/:id')
+  getUserDetail(@Param('id', ParseIntPipe) userId: number) {
+    return this.adminService.getUserDetail(userId);
+  }
+
+  // US-21 — quản lý danh mục (admin thấy cả mục đã ẩn)
+  @Get('languages')
+  getAllLanguages() {
+    return this.adminService.getAllLanguages();
+  }
+
+  @Get('topics')
+  getAllTopics() {
+    return this.adminService.getAllTopics();
+  }
+
+  @Post('languages')
+  createLanguage(@Body() dto: CreateLanguageDto) {
+    return this.adminService.createLanguage(dto);
+  }
+
+  @Patch('languages/:id')
+  updateLanguage(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateLanguageDto,
+  ) {
+    return this.adminService.updateLanguage(id, dto);
+  }
+
+  @Delete('languages/:id')
+  deleteLanguage(@Param('id', ParseIntPipe) id: number) {
+    return this.adminService.deleteLanguage(id);
+  }
+
+  @Post('topics')
+  createTopic(@Body() dto: CreateTopicDto) {
+    return this.adminService.createTopic(dto);
+  }
+
+  @Patch('topics/:id')
+  updateTopic(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateTopicDto,
+  ) {
+    return this.adminService.updateTopic(id, dto);
+  }
+
+  @Delete('topics/:id')
+  deleteTopic(@Param('id', ParseIntPipe) id: number) {
+    return this.adminService.deleteTopic(id);
+  }
+
+  @Get('words')
+  getSavedWords(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('languageId') languageId?: string,
+  ) {
+    return this.adminService.getSavedWords(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
+      search,
+      languageId ? parseInt(languageId, 10) : undefined,
+    );
+  }
+
+  @Delete('words/:id')
+  deleteWord(@Param('id', ParseIntPipe) id: number) {
+    return this.adminService.deleteWord(id);
+  }
+}

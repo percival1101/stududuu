@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+
+# builds
+dist/
+.next/
+out/
+build/
+
+# logs
+*.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+
+# design-sync (generated/machine state)
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+frontend/.ds-styles.css
+
+# AI Agents & IDE tools
+.claude/
+.codex/
+.impeccable/
+

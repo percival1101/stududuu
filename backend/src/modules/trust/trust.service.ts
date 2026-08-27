@@ -1,0 +1,169 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { EndorsementLabel } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
+import { CreateReportDto } from './dto/create-report.dto';
+import { EndorseDto } from './dto/endorse.dto';
+import { I18nService, I18nContext } from 'nestjs-i18n';
+
+@Injectable()
+export class TrustService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly i18n: I18nService,
+  ) {}
+
+  async report(reporterId: number, dto: CreateReportDto) {
+    if (reporterId === dto.reportedId) {
+      throw new BadRequestException(
+        this.i18n.t('translation.trust.noSelfReport', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+
+    const report = await this.prisma.report.create({
+      data: {
+        reporterId,
+        reportedId: dto.reportedId,
+        reason: dto.reason,
+        targetType: dto.targetType,
+        targetId: dto.targetId,
+      },
+    });
+
+    if (dto.targetType === 'post' && dto.targetId) {
+      try {
+        const post = await this.prisma.activityPost.findUnique({
+          where: { id: dto.targetId },
+          include: { group: true },
+        });
+
+        if (post && post.groupId && post.group) {
+          const admins = await this.prisma.groupMember.findMany({
+            where: {
+              groupId: post.groupId,
+              status: 'active',
+              role: { in: ['owner', 'admin'] },
+            },
+            select: { userId: true },
+          });
+
+          const adminUserIds = Array.from(
+            new Set([post.group.creatorId, ...admins.map((a) => a.userId)]),
+          ).filter((id) => id !== reporterId);
+
+          if (adminUserIds.length > 0) {
+            await this.prisma.notification.createMany({
+              data: adminUserIds.map((userId) => ({
+                userId,
+                senderId: reporterId,
+                type: 'group_post_report',
+                message: `[Báo cáo Nhóm] Có báo cáo mới về bài viết trong nhóm "${post.group?.name}": "${dto.reason}"`,
+                referenceId: post.groupId,
+              })),
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to notify group admins of report:', err);
+      }
+    }
+
+    return report;
+  }
+
+  // US-18 — block
+  async block(blockerId: number, blockedId: number) {
+    if (blockerId === blockedId) {
+      throw new BadRequestException(
+        this.i18n.t('translation.trust.noSelfBlock', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+    return this.prisma.block.upsert({
+      where: { blockerId_blockedId: { blockerId, blockedId } },
+      update: {},
+      create: { blockerId, blockedId },
+    });
+  }
+
+  // US-18 AC3 — unblock
+  async unblock(blockerId: number, blockedId: number) {
+    await this.prisma.block.deleteMany({ where: { blockerId, blockedId } });
+    return { unblocked: blockedId };
+  }
+
+  getBlocks(blockerId: number) {
+    return this.prisma.block.findMany({
+      where: { blockerId },
+      include: {
+        blocked: { select: { id: true, displayName: true, avatarUrl: true } },
+      },
+    });
+  }
+
+  // FS-26 — ghi nhận định tính; chỉ khi đã từng trò chuyện với nhau (≥1 CONVERSATION)
+  async endorse(giverId: number, dto: EndorseDto) {
+    if (giverId === dto.receiverId) {
+      throw new BadRequestException(
+        this.i18n.t('translation.trust.noSelfEndorse', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+
+    const sharedConversation = await this.prisma.conversation.findFirst({
+      where: {
+        match: {
+          OR: [
+            { memberId: giverId, candidateId: dto.receiverId },
+            { memberId: dto.receiverId, candidateId: giverId },
+          ],
+        },
+      },
+    });
+    if (!sharedConversation) {
+      throw new BadRequestException(
+        this.i18n.t('translation.trust.endorseOnlyConversed', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+
+    // UNIQUE(giver, receiver, label) — lặp lại thì bỏ qua, không cộng dồn (BR-13)
+    await this.prisma.endorsement.createMany({
+      data: dto.labels.map((label) => ({
+        giverId,
+        receiverId: dto.receiverId,
+        label,
+      })),
+      skipDuplicates: true,
+    });
+
+    return this.getEndorsements(dto.receiverId);
+  }
+
+  // FS-26 — đếm số lượt theo từng nhãn (KHÔNG tính trung bình/xếp hạng — BR-13)
+  async getEndorsements(userId: number) {
+    const grouped = await this.prisma.endorsement.groupBy({
+      by: ['label'],
+      where: { receiverId: userId },
+      _count: { _all: true },
+    });
+
+    const counts: Record<string, number> = {};
+    for (const label of Object.values(EndorsementLabel)) counts[label] = 0;
+    for (const g of grouped) counts[g.label] = g._count._all;
+    return counts;
+  }
+
+  /** Nhãn mình đã ghi nhận cho một người (để FE disable checkbox đã chọn) */
+  async getGivenEndorsements(giverId: number, receiverId: number) {
+    const rows = await this.prisma.endorsement.findMany({
+      where: { giverId, receiverId },
+      select: { label: true },
+    });
+    return rows.map((r) => r.label);
+  }
+}

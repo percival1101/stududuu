@@ -3,12 +3,20 @@ import { io, type Socket } from 'socket.io-client';
 function getSocketUrl(): string {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
+    if (hostname.includes('stududu.site') || hostname.includes('vercel.app') || hostname.includes('stududu.com.vn')) {
+      return 'https://stududu-api.onrender.com';
+    }
     if (hostname.includes('stududu.io.vn')) {
       return 'https://api.stududu.io.vn';
     }
   }
-  return process.env.NEXT_PUBLIC_SOCKET_URL ?? 'http://localhost:3001';
+  const envUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+  if (envUrl && !envUrl.startsWith('/')) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  return 'https://stududu-api.onrender.com';
 }
+
 
 let socket: Socket | null = null;
 

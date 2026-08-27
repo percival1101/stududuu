@@ -1,13 +1,20 @@
 export function getApiUrl(): string {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
+    if (hostname.includes('stududu.site') || hostname.includes('vercel.app') || hostname.includes('stududu.com.vn')) {
+      return 'https://stududu-api.onrender.com/api';
+    }
     if (hostname.includes('stududu.io.vn')) {
       return 'https://api.stududu.io.vn';
     }
   }
   const envUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_API_URL : undefined;
-  return envUrl ? envUrl.replace(/\/+$/, '') : 'http://localhost:3001';
+  if (envUrl && !envUrl.startsWith('/')) {
+    return envUrl.replace(/\/+$/, '');
+  }
+  return 'https://stududu-api.onrender.com/api';
 }
+
 
 export class ApiError extends Error {
   constructor(

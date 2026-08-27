@@ -19,7 +19,11 @@ export class MailService {
         port,
         secure: port === 465,
         auth: { user, pass },
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
       });
+
       this.logger.log(`SMTP Mailer initialized successfully (${host}:${port})`);
     } else {
       this.logger.warn(
@@ -227,18 +231,23 @@ export class MailService {
       return true; // Dev mode success
     }
 
-    try {
-      const from = this.config.get<string>('SMTP_FROM') ?? 'Stududu Security <noreply@stududu.com>';
-      await this.transporter.sendMail({
+    const from = this.config.get<string>('SMTP_FROM') ?? 'Stududu Security <noreply@stududu.com>';
+
+    // Gửi email bất đồng bộ ngầm (Fire & Forget) để HTTP API phản hồi tức thì trong 0.1 giây
+    this.transporter
+      .sendMail({
         from,
         to,
         subject,
         html,
+      })
+      .then(() => {
+        this.logger.log(`Email sent successfully to ${to}`);
+      })
+      .catch((err: any) => {
+        this.logger.error(`Failed to send email to ${to}: ${err.message}`);
       });
-      return true;
-    } catch (err: any) {
-      this.logger.error(`Failed to send email to ${to}: ${err.message}`);
-      return false;
-    }
+
+    return true;
   }
 }

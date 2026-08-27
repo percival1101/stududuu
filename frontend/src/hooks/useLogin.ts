@@ -26,9 +26,25 @@ export function useLogin() {
   }, []);
 
   const handleGoogleClick = () => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-    window.location.href = `${API_URL}/auth/google`;
+    import("@/lib/google-auth").then(({ promptGoogleAuth }) => {
+      promptGoogleAuth({
+        onSuccess: (data) => {
+          document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000`;
+          if (data.role === "admin") {
+            router.push("/admin", { locale });
+          } else if (data.needsOnboarding) {
+            router.push("/onboarding", { locale });
+          } else {
+            router.push("/discover", { locale });
+          }
+        },
+        onError: (errMsg) => {
+          setError(errMsg);
+        },
+      });
+    });
   };
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -10,9 +10,18 @@ interface GoogleSignInButtonProps {
 
 export function GoogleSignInButton({ t, label }: GoogleSignInButtonProps) {
   const handleGoogleRedirect = () => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-    window.location.href = `${API_URL}/auth/google`;
+    import("@/lib/google-auth").then(({ promptGoogleAuth }) => {
+      promptGoogleAuth({
+        onSuccess: () => {
+          window.location.href = "/discover";
+        },
+        onError: (err) => {
+          alert(err);
+        },
+      });
+    });
   };
+
 
   return (
     <Button

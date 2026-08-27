@@ -693,6 +693,7 @@ export function useChatInbox() {
     handleDeleteMessage,
     scrollToMessage,
     handleReport,
+    handleBlock,
     isStrangerRequest,
     handleAcceptRequest,
     tab,
@@ -701,5 +702,6 @@ export function useChatInbox() {
     strangerRequestsCount,
   };
 }
+
 
 

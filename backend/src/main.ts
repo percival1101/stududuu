@@ -9,7 +9,9 @@ async function bootstrap() {
   // (ảnh đại diện gửi dạng data URL đã nén ~vài trăm KB)
   const app = await NestFactory.create(AppModule, { bodyParser: false });
 
+  app.setGlobalPrefix('api');
   app.use(json({ limit: '2mb' }));
+
   app.use(urlencoded({ limit: '2mb', extended: true }));
 
   app.enableCors({
